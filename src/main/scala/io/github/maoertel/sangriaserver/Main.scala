@@ -1,8 +1,9 @@
 package io.github.maoertel.sangriaserver
 
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{ContextShift, ExitCode, IO, IOApp}
 import com.typesafe.config.ConfigFactory
 import io.github.maoertel.sangriaserver.graphql.GraphQlSchema
+import io.github.maoertel.sangriaserver.persistence.Database
 import io.github.maoertel.sangriaserver.repo.ProductRepository
 import sangria.schema.Schema
 
@@ -11,17 +12,23 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 object Main extends IOApp {
 
   implicit val ec: ExecutionContextExecutor = ExecutionContext.global
+  implicit val cs: ContextShift[IO] = IO.contextShift(ec)
 
   def run(args: List[String]): IO[ExitCode] =
     for {
       config <- IO(ConfigFactory.load())
+
       port = config.getInt("serverConfig.port")
       host = config.getString("serverConfig.host")
       server = ServerConfig(host, port)
 
+      connectionString = config.getString("db.connectionString")
+      dbName = config.getString("db.name")
+      database = Database(connectionString, dbName)
+
       schema = GraphQlSchema.schema
 
-      productRepo = ProductRepository()
+      productRepo = ProductRepository(database.getCollection("products"))
       graphQlContext = GraphQlService(productRepo)
 
       env = Environment(server, schema, graphQlContext)

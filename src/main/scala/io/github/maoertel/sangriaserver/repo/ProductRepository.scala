@@ -1,28 +1,40 @@
 package io.github.maoertel.sangriaserver.repo
 
 import io.github.maoertel.sangriaserver.graphql.GraphQlSchema.{Product, ProductInput}
+import org.mongodb.scala.MongoCollection
+import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.model.Updates
+import org.mongodb.scala.model.Updates.set
+
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 trait ProductRepository {
-  def product(id: String): Option[Product]
+  def getProduct(id: String): Future[Option[Product]]
 
-  def products: List[Product]
+  def getProducts: Future[List[Product]]
 
-  def updateProductsById(id: String, productDraft: ProductInput): Option[Product]
+  def updateProductsById(id: String, productDraft: ProductInput): Future[Option[Product]]
 }
 
 object ProductRepository {
 
-  def apply(): ProductRepository = new ProductRepository {
-    private val Products = List(
-      Product("1", "Cheesecake", "Tasty"),
-      Product("2", "Health Potion", "+50 HP"))
+  def apply(
+    productsColl: MongoCollection[_]
+  )(implicit ec: ExecutionContextExecutor): ProductRepository = new ProductRepository {
 
-    def product(id: String): Option[Product] =
-      Products find (_.id == id)
+    def getProduct(id: String): Future[Option[Product]] =
+      productsColl.find[Product](equal("firstName", "Ida")).toFuture().map(_.headOption)
 
-    def products: List[Product] = Products
+    def getProducts: Future[List[Product]] =
+      productsColl.find[Product]().toFuture().map(_.toList)
 
-    def updateProductsById(id: String, productDraft: ProductInput): Option[Product] =
-      Some(Product(id = id, name = productDraft.name, description = productDraft.description))
+    def updateProductsById(id: String, productDraft: ProductInput): Future[Option[Product]] =
+      productsColl
+        .updateOne(
+          equal("id", id),
+          Updates.combine(set("name", productDraft.name), set("description", productDraft.description))
+        )
+        .toFuture()
+        .flatMap(_ => getProduct(id))
   }
 }

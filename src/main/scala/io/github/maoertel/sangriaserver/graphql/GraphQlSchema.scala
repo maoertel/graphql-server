@@ -53,11 +53,11 @@ object GraphQlSchema {
     Field("product", OptionType(ProductType),
       description = Some("Returns a product with specific `id`."),
       arguments = Id :: Nil,
-      resolve = c => c.ctx.products.product(c arg Id)),
+      resolve = c => c.ctx.products.getProduct(c arg Id)),
 
     Field("products", ListType(ProductType),
       description = Some("Returns a list of all available products."),
-      resolve = _.ctx.products.products)))
+      resolve = _.ctx.products.getProducts)))
 
   case class ProductInput(name: String, description: String)
 

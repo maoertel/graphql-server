@@ -24,7 +24,9 @@ lazy val root = (project in file("."))
       "org.scalameta" %% "svm-subs" % "20.2.0",
 
       "org.sangria-graphql" %% "sangria" % "2.0.0",
-      "org.sangria-graphql" %% "sangria-circe" % "1.3.0"
+      "org.sangria-graphql" %% "sangria-circe" % "1.3.0",
+
+      "org.mongodb.scala" %% "mongo-scala-driver" % "4.1.1"
     ),
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
     addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")

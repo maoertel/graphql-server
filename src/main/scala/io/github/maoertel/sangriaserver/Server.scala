@@ -1,7 +1,7 @@
 package io.github.maoertel.sangriaserver
 
 import cats.effect.{ContextShift, IO, Timer}
-import fs2.Stream
+import fs2.{INothing, Stream}
 import io.github.maoertel.sangriaserver.graphql.{GraphQlExecutor, GraphQlServerRoutes}
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
@@ -11,9 +11,13 @@ import scala.concurrent.ExecutionContextExecutor
 
 object Server {
 
-  def stream(env: Environment)(implicit T: Timer[IO], ec: ExecutionContextExecutor): Stream[IO, Nothing] = {
-
-    implicit val cs: ContextShift[IO] = IO.contextShift(ec)
+  def stream(
+    env: Environment
+  )(implicit
+    timer: Timer[IO],
+    ec: ExecutionContextExecutor,
+    cs: ContextShift[IO]
+  ): Stream[IO, INothing] = {
 
     val graphQlExecutor = GraphQlExecutor.impl(env.schema, env.graphQlService)
     val httpApp = GraphQlServerRoutes.graphQlRoutes(graphQlExecutor).orNotFound
