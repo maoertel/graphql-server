@@ -9,3 +9,4 @@ target
 .idea
 .bsp
 out
+/src/main/resources/db.conf

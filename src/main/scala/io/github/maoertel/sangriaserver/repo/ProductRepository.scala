@@ -23,7 +23,7 @@ object ProductRepository {
   )(implicit ec: ExecutionContextExecutor): ProductRepository = new ProductRepository {
 
     def getProduct(id: String): Future[Option[Product]] =
-      productsColl.find[Product](equal("firstName", "Ida")).toFuture().map(_.headOption)
+      productsColl.find[Product](equal("id", id)).toFuture().map(_.headOption)
 
     def getProducts: Future[List[Product]] =
       productsColl.find[Product]().toFuture().map(_.toList)
