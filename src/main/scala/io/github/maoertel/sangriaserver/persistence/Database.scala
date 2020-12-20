@@ -3,6 +3,7 @@ package io.github.maoertel.sangriaserver.persistence
 import org.mongodb.scala.MongoCredential.createCredential
 import org.mongodb.scala.connection.{ClusterSettings, SslSettings}
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoCollection}
+import io.github.maoertel.sangriaserver.model.Product
 
 trait Database {
   def getCollection(name: String): MongoCollection[Product]

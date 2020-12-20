@@ -3,7 +3,7 @@ package io.github.maoertel.sangriaserver
 import cats.effect.{ContextShift, ExitCode, IO, IOApp}
 import com.typesafe.config.ConfigFactory
 import io.github.maoertel.sangriaserver.graphql.GraphQlSchema
-import io.github.maoertel.sangriaserver.graphql.GraphQlSchema.Product.personCodecProvider
+import io.github.maoertel.sangriaserver.model.Product.personCodecProvider
 import io.github.maoertel.sangriaserver.persistence.{Database, DbConfig}
 import io.github.maoertel.sangriaserver.repo.ProductRepository
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}

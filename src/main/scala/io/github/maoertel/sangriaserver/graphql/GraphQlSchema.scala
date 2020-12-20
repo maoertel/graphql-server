@@ -1,8 +1,13 @@
 package io.github.maoertel.sangriaserver.graphql
 
+import io.circe.generic.auto._
 import io.github.maoertel.sangriaserver.GraphQlService
-import org.bson.codecs.configuration.CodecProvider
-import org.mongodb.scala.bson.codecs.Macros
+import io.github.maoertel.sangriaserver.model.{Picture, Product}
+import org.mongodb.scala.bson.ObjectId
+import sangria.macros.derive._
+import sangria.marshalling.circe._
+import sangria.schema._
+import sangria.validation.ValueCoercionViolation
 
 import scala.concurrent.ExecutionContext.global
 
@@ -10,11 +15,17 @@ object GraphQlSchema {
 
   implicit val ec = global
 
-  case class Picture(width: Int, height: Int, url: Option[String])
+  case object ObjectIdViolation extends ValueCoercionViolation("String or Int value expected")
 
-  import sangria.schema._
+  implicit val ObjectIdType: ScalarAlias[ObjectId, String] = ScalarAlias[ObjectId, String](
+    StringType,
+    toScalar = _.toString,
+    fromScalar = idString =>
+      try Right(new ObjectId(idString))
+      catch {
+        case _: IllegalArgumentException => Left(ObjectIdViolation)
+      })
 
-  // creating a picture GraphQL Object Type
   implicit val PictureType = ObjectType(
     "Picture",
     "The product picture",
@@ -25,29 +36,14 @@ object GraphQlSchema {
     )
   )
 
-  import sangria.macros.derive._
-
   trait Identifiable {
-    def id: String
+    def id: ObjectId
   }
 
   val IdentifiableType = InterfaceType(
     "Identifiable",
     "Entity that can be identified",
-    fields[Unit, Identifiable](Field("id", StringType, resolve = _.value.id)))
-
-  // create a GraphQL ObjectType with Interface with deriving
-  case class Product(
-    id: String,
-    name: String,
-    description: String
-  ) extends Identifiable {
-    def picture(size: Int): Picture =
-      Picture(width = size, height = size, url = Some(s"//cdn.com/$size/$id.jpg"))
-  }
-  object Product {
-    val personCodecProvider: CodecProvider = Macros.createCodecProviderIgnoreNone[Product]()
-  }
+    fields[Unit, Identifiable](Field("id", ObjectIdType, resolve = _.value.id)))
 
   val ProductType =
     deriveObjectType[Unit, Product](
@@ -55,7 +51,7 @@ object GraphQlSchema {
       IncludeMethods("picture")
     )
 
-  val Id = Argument("id", StringType)
+  val Id = Argument("id", ObjectIdType)
 
   val QueryType = ObjectType(
     "Query",
@@ -85,9 +81,6 @@ object GraphQlSchema {
     InputObjectTypeName("ProductInput")
   )
 
-  import io.circe.generic.auto._
-  import sangria.marshalling.circe._
-
   val ProductInputArgument = Argument("productDraft", ProductInputType)
 
   val MutationType = ObjectType(
@@ -98,7 +91,14 @@ object GraphQlSchema {
         OptionType(ProductType),
         description = Some("Updates a product by ID"),
         arguments = Id :: ProductInputArgument :: Nil,
-        resolve = c => c.ctx.products.updateProductsById(c arg Id, c arg ProductInputArgument)
+        resolve = c => c.ctx.products.updateProductById(c arg Id, c arg ProductInputArgument)
+      ),
+      Field(
+        "createProduct",
+        OptionType(ProductType),
+        description = Some("Creates a product from ProductInput."),
+        arguments = ProductInputArgument :: Nil,
+        resolve = c => c.ctx.products.createProduct(c arg ProductInputArgument)
       ))
   )
 
