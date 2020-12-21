@@ -1,12 +1,20 @@
 package io.github.maoertel.sangriaserver.persistence
 
+import io.github.maoertel.sangriaserver.model.Product
 import org.mongodb.scala.MongoCredential.createCredential
 import org.mongodb.scala.connection.{ClusterSettings, SslSettings}
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoCollection}
-import io.github.maoertel.sangriaserver.model.Product
 
 trait Database {
-  def getCollection(name: String): MongoCollection[Product]
+  def getCollection(coll: Collections): MongoCollection[Product]
+}
+
+sealed trait Collections {
+  def name: String
+}
+
+case object Products extends Collections {
+  def name = "products"
 }
 
 object Database {
@@ -35,6 +43,6 @@ object Database {
 
     private lazy val db = client.getDatabase(dbConfig.dbName).withCodecRegistry(dbConfig.codecRegistry)
 
-    override def getCollection(name: String): MongoCollection[Product] = db.getCollection(name)
+    override def getCollection(coll: Collections): MongoCollection[Product] = db.getCollection(coll.name)
   }
 }

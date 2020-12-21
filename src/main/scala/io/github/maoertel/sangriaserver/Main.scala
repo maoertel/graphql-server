@@ -2,9 +2,9 @@ package io.github.maoertel.sangriaserver
 
 import cats.effect.{ContextShift, ExitCode, IO, IOApp}
 import com.typesafe.config.ConfigFactory
-import io.github.maoertel.sangriaserver.graphql.GraphQlSchema
+import io.github.maoertel.sangriaserver.graphql.{GraphQlSchema, ProductGraphQlTypes}
 import io.github.maoertel.sangriaserver.model.Product.personCodecProvider
-import io.github.maoertel.sangriaserver.persistence.{Database, DbConfig}
+import io.github.maoertel.sangriaserver.persistence.{Database, DbConfig, Products}
 import io.github.maoertel.sangriaserver.repo.ProductRepository
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala.ConnectionString
@@ -32,17 +32,15 @@ object Main extends IOApp {
       user = dbConfig.getString("db.user")
       password = dbConfig.getString("db.password")
       codecRegistry = fromRegistries(fromProviders(personCodecProvider), DEFAULT_CODEC_REGISTRY)
-
       dataBaseConfig = DbConfig(ConnectionString(connectionString), dbName, user, password.toCharArray, codecRegistry)
-
       database = Database(dataBaseConfig)
 
-      schema = GraphQlSchema.schema
+      graphQlSchema = GraphQlSchema(ProductGraphQlTypes).schema
 
-      productRepo = ProductRepository(database.getCollection("products"))
+      productRepo = ProductRepository(database.getCollection(Products))
       graphQlContext = GraphQlService(productRepo)
 
-      env = Environment(server, schema, graphQlContext)
+      env = Environment(server, graphQlSchema, graphQlContext)
 
       server <- Server.stream(env).compile.drain.as(ExitCode.Success)
     } yield server

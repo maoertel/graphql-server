@@ -2,7 +2,7 @@ package io.github.maoertel.sangriaserver.validation
 
 import cats.effect.IO
 import io.circe.{Json, ParsingFailure}
-import io.github.maoertel.sangriaserver.graphql.model.{GqlGetInputDraft, GqlPostInputDraft}
+import io.github.maoertel.sangriaserver.graphql.{GqlGetInputDraft, GqlPostInputDraft}
 import org.http4s.Request
 import sangria.ast.Document
 import sangria.parser.QueryParser

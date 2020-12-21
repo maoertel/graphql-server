@@ -1,7 +1,6 @@
 package io.github.maoertel.sangriaserver.repo
 
-import io.github.maoertel.sangriaserver.graphql.GraphQlSchema.ProductInput
-import io.github.maoertel.sangriaserver.model.Product
+import io.github.maoertel.sangriaserver.model.{Product, ProductInput}
 import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.bson.ObjectId
 import org.mongodb.scala.model.Filters.equal
@@ -34,6 +33,7 @@ object ProductRepository {
 
     def createProduct(productDraft: ProductInput): Future[Option[Product]] =
       productsColl
+        // find a more elegant way as loading the aggregate again after inserting :facepalm:
         .insertOne(Product(id = new ObjectId(), productDraft.name, productDraft.description))
         .toFuture()
         .map(_.getInsertedId.asObjectId().getValue)
@@ -41,7 +41,7 @@ object ProductRepository {
 
     def updateProductById(id: ObjectId, productDraft: ProductInput): Future[Option[Product]] =
       productsColl
-        // replace with findOneAndUpdate
+        // replace with findOneAndUpdate to prevent form two roundtrips
         .updateOne(
           equal("_id", id),
           Updates.combine(set("name", productDraft.name), set("description", productDraft.description))

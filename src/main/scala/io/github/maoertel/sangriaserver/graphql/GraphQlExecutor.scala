@@ -6,7 +6,6 @@ import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.syntax.EncoderOps
 import io.github.maoertel.sangriaserver.GraphQlService
-import io.github.maoertel.sangriaserver.graphql.model.{GraphQlError, GraphQlErrorResponse}
 import sangria.ast.Document
 import sangria.execution._
 import sangria.marshalling.circe._

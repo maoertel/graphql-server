@@ -1,4 +1,4 @@
-package io.github.maoertel.sangriaserver.graphql.model
+package io.github.maoertel.sangriaserver.graphql
 
 import cats.effect.IO
 import io.circe.generic.auto._
@@ -8,7 +8,7 @@ import org.http4s.EntityDecoder
 import org.http4s.circe.jsonOf
 
 case class GqlGetInputDraft(
-  query: String,
+                             query: String,
   operationName: Option[String],
   variables: Option[String]
 )
