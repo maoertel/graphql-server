@@ -55,7 +55,7 @@ object ProductGraphQlTypes extends GraphQlTypes {
     Field(
       "updateProduct",
       OptionType(ProductType),
-      description = Some("Updates a product by ID"),
+      description = Some("Updates a product by ID."),
       arguments = Id :: ProductInputArgument :: Nil,
       resolve = c => c.ctx.products.updateProductById(c arg Id, c arg ProductInputArgument)
     ),
@@ -65,6 +65,13 @@ object ProductGraphQlTypes extends GraphQlTypes {
       description = Some("Creates a product from ProductInput."),
       arguments = ProductInputArgument :: Nil,
       resolve = c => c.ctx.products.createProduct(c arg ProductInputArgument)
+    ),
+    Field(
+      "deleteProduct",
+      OptionType(ObjectIdType),
+      description = Some("Deletes a product by ID."),
+      arguments = Id :: Nil,
+      resolve = c => c.ctx.products.deleteProduct(c arg Id)
     )
   )
 }

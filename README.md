@@ -64,4 +64,9 @@ echo '{
 
 ### Delete a Product
 
-- `not implemented yet`
+```shell
+echo '{
+  "query": "mutation Foo($id: String!) { deleteProduct(id: $id) }",
+  "variables": { "id": "<put in the ID of the product you wanna delete>" }
+}' | http -f POST :8080/graphql
+```
