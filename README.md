@@ -9,7 +9,7 @@
 
 ## Preparation
 
-Add an own `db.conf` ot `resources` file with the following properties:
+Add an own `db.conf` file in `resources` with the following properties:
 
 ```hocon
 db {

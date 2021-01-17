@@ -8,18 +8,17 @@ import org.mongodb.scala.bson.annotations.BsonProperty
 import org.mongodb.scala.bson.codecs.Macros
 
 case class Product(
-                    @BsonId
-                    @BsonProperty("_id")
-                    id: ObjectId,
-                    name: String,
-                    description: String
-                  ) extends Identifiable {
-  def picture(size: Int): Picture =
-    Picture(width = size, height = size, url = Some(s"//cdn.com/$size/$id.jpg"))
+  @BsonId
+  @BsonProperty("_id")
+  id: ObjectId,
+  name: String,
+  description: String
+) extends Identifiable {
+  def picture(size: Int): Picture = Picture(width = size, height = size, url = Some(s"//cdn.com/$size/$id.jpg"))
 }
 
 object Product {
-  val personCodecProvider: CodecProvider = Macros.createCodecProviderIgnoreNone[Product]()
+  val productCodecProvider: CodecProvider = Macros.createCodecProviderIgnoreNone[Product]()
 }
 
 case class ProductInput(name: String, description: String)

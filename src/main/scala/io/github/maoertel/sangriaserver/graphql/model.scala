@@ -8,10 +8,10 @@ import org.http4s.EntityDecoder
 import org.http4s.circe.jsonOf
 
 case class GqlGetInputDraft(
-                             query: String,
-                             operationName: Option[String],
-                             variables: Option[String]
-                           )
+  query: String,
+  operationName: Option[String],
+  variables: Option[String]
+)
 
 case class GqlPostInputDraft(
   query: String,

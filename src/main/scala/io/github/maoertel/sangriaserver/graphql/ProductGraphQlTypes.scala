@@ -6,7 +6,7 @@ import io.github.maoertel.sangriaserver.graphql.CommonGraphQlTypes._
 import io.github.maoertel.sangriaserver.model.{Picture, Product, ProductInput}
 import sangria.macros.derive._
 import sangria.marshalling.circe._
-import sangria.schema.{Argument, Field, InputObjectType, IntType, ListType, ObjectType, OptionType, StringType, fields}
+import sangria.schema.{fields, Argument, Field, InputObjectType, IntType, ListType, ObjectType, OptionType, StringType}
 
 object ProductGraphQlTypes extends GraphQlTypes {
 

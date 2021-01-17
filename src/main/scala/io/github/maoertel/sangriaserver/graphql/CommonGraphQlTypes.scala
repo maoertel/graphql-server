@@ -2,7 +2,7 @@ package io.github.maoertel.sangriaserver.graphql
 
 import io.github.maoertel.sangriaserver.GraphQLViolations.ObjectIdViolation
 import org.mongodb.scala.bson.ObjectId
-import sangria.schema.{Argument, Field, InterfaceType, ScalarAlias, StringType, fields}
+import sangria.schema.{fields, Argument, Field, InterfaceType, ScalarAlias, StringType}
 
 object CommonGraphQlTypes {
 
